@@ -23,6 +23,7 @@ var app = {
     });
 
     // Continues to call refreshTime and update Chat contents
+    // only renders posts with unique IDs
     app.updater();
 
   },
@@ -77,6 +78,7 @@ var app = {
     posting.append('<div class="timePosted" data-time="'+ timeCreated +'">'
                   + moment(message.createdAt).startOf('minute').fromNow() + '</div>');
     posting.append('<div class="postTxt">' + message.text + '</div>');
+    posting.append('<div class="postID" data-ID="'+ message.objectId + '"></div>');
     $('#chats').prepend(posting);
   },
 
@@ -85,7 +87,7 @@ var app = {
       return this.value;
     }).toArray();
     if (!_.contains(allRoomNames, name)) {
-      let roomz = $('<option class="roomChoice" value="' + name + '">' + name + '</option>');
+      let roomz = $('<option class="roomChoice" data="' + name + '">' + name + '</option>');
       $('#roomSelect').append(roomz);
     }
   },
@@ -110,10 +112,13 @@ var app = {
 
   populateChat: (chat) => {
     let allRooms = [];
-
+    let allPostsID = $('.postID').map(function() {
+      return $(this).data('id');
+    }).toArray();
+    console.log(allPostsID);
     _.each(chat, (msg) => {
       if (_.indexOf(allRooms, msg.roomname) === -1) allRooms.push(msg.roomname);
-        app.renderMessage(msg);
+      if (_.indexOf(allPostsID, msg.objectId) === -1)  app.renderMessage(msg);
     });
 
     _.each(allRooms, (room) => {
