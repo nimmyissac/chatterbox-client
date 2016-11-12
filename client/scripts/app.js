@@ -4,9 +4,9 @@ var app = {
 
     app.server = 'https://api.parse.com/1/classes/messages';
 
-    app.renderRoom('secret');
-
-    app.fetch('secret');
+    app.renderRoom('secret!!!');
+    let room = $('#roomSelect').val();
+    app.fetch(room);
 
     $('.username').on('click', function() {
       app.handleUsernameClick();
@@ -14,6 +14,12 @@ var app = {
 
     $('.submit').on('click', function() {
       app.handleSubmit();
+    });
+
+    $('#roomSelect').on('click', function() {
+      let room = $('#roomSelect').val();
+      app.clearMessages();
+      app.fetch(room);
     });
   },
 
@@ -25,7 +31,8 @@ var app = {
       contentType: 'application/json',
       success: function (data) {
         console.log('chatterbox: Message sent');
-        app.fetch();
+        let room = $('#roomSelect').val();
+        app.fetch(room);
       },
       error: function (data) {
         // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -67,8 +74,13 @@ var app = {
   },
 
   renderRoom: (name) => {
-    let roomz = $('<option value="' + name + '">' + name + '</option>');
-    $('#roomSelect').append(roomz);
+    let allRoomNames = $('.roomChoice').map(function() {
+      return this.value;
+    }).toArray();
+    if (!_.contains(allRoomNames, name)) {
+      let roomz = $('<option class="roomChoice" value="' + name + '">' + name + '</option>');
+      $('#roomSelect').append(roomz);
+    }
   },
 
   handleUsernameClick: () => {
@@ -94,7 +106,7 @@ var app = {
 
     _.each(chat, (msg) => {
       if (_.indexOf(allRooms, msg.roomname) === -1) allRooms.push(msg.roomname);
-      if (msg.roomname !== 'lobby') app.renderMessage(msg);
+        app.renderMessage(msg);
     });
 
     _.each(allRooms, (room) => {
