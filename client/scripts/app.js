@@ -4,18 +4,22 @@ var app = {
 
     app.server = 'https://api.parse.com/1/classes/messages';
 
+    //
     app.renderRoom('secret!!!');
     let room = $('#roomSelect').val();
     app.fetch(room);
 
+    // On Click Event Handlers
     $('.username').on('click', function() {
       app.handleUsernameClick();
     });
 
+      // Sends a message with the txt in form field
     $('.submit').on('click', function() {
       app.handleSubmit();
     });
 
+      // Room drop down menu
     $('#roomSelect').on('click', function() {
       let room = $('#roomSelect').val();
       app.clearMessages();
@@ -29,8 +33,9 @@ var app = {
   },
 
   send: (message) => {
+    // AJAX POST request, recieves JSON objects
     $.ajax({
-      url: 'https://api.parse.com/1/classes/messages',
+      url: app.server,
       type: 'POST',
       data: JSON.stringify(message),
       contentType: 'application/json',
@@ -47,16 +52,19 @@ var app = {
   },
 
   fetch: (roomname) => {
+    // Query Constraint: message's roomname value must match
     var obj = {
      "roomname": roomname,
     };
     var query = encodeURIComponent('where='+ JSON.stringify(obj));
+
+    // AJAX GET request with Query Constraint
     $.ajax({
-      url: 'https://api.parse.com/1/classes/messages?' + query,
+      url: app.server + '?' + query,
       type: 'GET',
       contentType: 'application/json',
       success: function (data) {
-        console.log('fetched:', data);
+        // console.log('fetched:', data);
         app.populateChat(data.results);
         console.log('chatterbox: Message recieved');
       },
@@ -74,18 +82,29 @@ var app = {
   renderMessage: (message) => {
     let posting = $('<div class="container"></div>');
     let timeCreated = message.createdAt;
+
+    // Post Structure
+      // User Name
     posting.append('<div class="username">' + message.username + '</div>');
+      // Time Created
     posting.append('<div class="timePosted" data-time="'+ timeCreated +'">'
                   + moment(message.createdAt).startOf('minute').fromNow() + '</div>');
+      // Message Text
     posting.append('<div class="postTxt">' + message.text + '</div>');
+      // Hidden unique post ID
     posting.append('<div class="postID" data-ID="'+ message.objectId + '"></div>');
+
+    // prepend to have most recent posts at top
     $('#chats').prepend(posting);
   },
 
   renderRoom: (name) => {
+    // collects the roomnames of all rooms added to DOM
     let allRoomNames = $('.roomChoice').map(function() {
       return this.value;
     }).toArray();
+
+    // only appends 'name' if the room doesnt exist in DOM
     if (!_.contains(allRoomNames, name)) {
       let roomz = $('<option class="roomChoice" data="' + name + '">' + name + '</option>');
       $('#roomSelect').append(roomz);
@@ -96,6 +115,7 @@ var app = {
 
   },
 
+  // uses on Click event handler to circumvent refresh from submit forms
   handleSubmit: () => {
     let txt = $('#message').val();
     let user  = window.location.search.slice(10);
@@ -112,15 +132,21 @@ var app = {
 
   populateChat: (chat) => {
     let allRooms = [];
+    // Pulls id of posts from all displayed posts
     let allPostsID = $('.postID').map(function() {
       return $(this).data('id');
     }).toArray();
-    console.log(allPostsID);
+
+    // Iterates over all recieved messages from fetch
     _.each(chat, (msg) => {
+      // collects unique roomnames from messages
       if (_.indexOf(allRooms, msg.roomname) === -1) allRooms.push(msg.roomname);
+
+      // only renders messages that arent currently displayed
       if (_.indexOf(allPostsID, msg.objectId) === -1)  app.renderMessage(msg);
     });
 
+    // renders unique rooms from fetch
     _.each(allRooms, (room) => {
       app.renderRoom(room);
     });
@@ -132,7 +158,7 @@ var app = {
       app.fetch(room);
       app.refreshTime();
       app.updater();
-    }, 10000);
+    }, 8000);
   },
 
   refreshTime: () => {
