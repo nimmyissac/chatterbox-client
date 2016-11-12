@@ -3,6 +3,7 @@ body {
     text-align: center;
     padding: 0 25px;
     font-family: arial, sans-serif;
+    background-color: rgba(20, 58, 119, 0.8);
 }
 
 #main, #chats {
@@ -18,12 +19,17 @@ body {
 #main h1 {
     margin-top: 0;
     font-size: 35px;
+    font-weight: bold;
     margin-bottom: 5px;
     padding: 5px;
+    color: rgba(20, 58, 119, 0.8);
+    transition-property: color, background-color, padding-left, text-shadow;
+    transition-duration: 1.6s, 1.8s, 1.55s, 1.4s;
 }
 
 #main h1 span {
     font-style:italic;
+    background-color: rgba(20, 58, 119, 0.8);
 }
 
 #main ul {
