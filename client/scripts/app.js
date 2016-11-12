@@ -21,6 +21,10 @@ var app = {
       app.clearMessages();
       app.fetch(room);
     });
+
+    // Continues to call refreshTime and update Chat contents
+    app.updater();
+
   },
 
   send: (message) => {
@@ -68,9 +72,12 @@ var app = {
 
   renderMessage: (message) => {
     let posting = $('<div class="container"></div>');
+    let timeCreated = message.createdAt;
     posting.append('<div class="username">' + message.username + '</div>');
+    posting.append('<div class="timePosted" data-time="'+ timeCreated +'">'
+                  + moment(message.createdAt).startOf('minute').fromNow() + '</div>');
     posting.append('<div class="postTxt">' + message.text + '</div>');
-    $('#chats').append(posting);
+    $('#chats').prepend(posting);
   },
 
   renderRoom: (name) => {
@@ -111,6 +118,23 @@ var app = {
 
     _.each(allRooms, (room) => {
       app.renderRoom(room);
+    });
+  },
+
+  updater: function() {
+    setTimeout(function() {
+      let room = $('#roomSelect').val();
+      app.fetch(room);
+      app.refreshTime();
+      app.updater();
+    }, 4000);
+  },
+
+  refreshTime: () => {
+    let allPosts = $('.timePosted');
+    _.each(allPosts, (eachPost) => {
+      let time = $(eachPost).data('time');
+      $(eachPost).text(moment(time).startOf('minute').fromNow());
     });
   }
 };
