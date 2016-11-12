@@ -104,10 +104,6 @@ form input[type=text] {
   margin-left: 12px;
 }
 
-.postTxt {
-  margin-left: 6px;
-}
-
 .container {
   margin-top: 20px;
   margin-bottom: 20px;
@@ -125,4 +121,18 @@ form input[type=text] {
   -webkit-animation-duration: 1s;
   transition-property: color, background-color, padding-top, padding-bottom, padding-left, padding-right, margin-left, margin-top, margin-bottom;
   transition-duration: 0.28s, 0.28s, 0.32s, 0.32s, 0.32s, 0.32s, 0.32s, 0.25s, 0.25s;
+}
+
+.username {
+  float: left;
+  margin-right: 5px;
+}
+
+.timePosted {
+  float: left;
+  width: 83%;
+}
+
+.postTxt {
+  margin-left: 20px;
 }

@@ -82,13 +82,16 @@ var app = {
   renderMessage: (message) => {
     let posting = $('<div class="container"></div>');
     let timeCreated = message.createdAt;
+    let symb = ('&raquo;' + ' ');
+    let bult = ('&bull;' + ' ');
+    message.text = symb + message.text;
 
     // Post Structure
       // User Name
-    posting.append('<div class="username">' + message.username + '</div>');
+    posting.append('<div class="username">' + '@' + message.username + '</div>');
       // Time Created
     posting.append('<div class="timePosted" data-time="'+ timeCreated +'">'
-                  + moment(message.createdAt).startOf('minute').fromNow() + '</div>');
+                  + bult + moment(message.createdAt).startOf('minute').fromNow() + '</div>');
       // Message Text
     posting.append('<div class="postTxt">' + message.text + '</div>');
       // Hidden unique post ID
@@ -163,9 +166,10 @@ var app = {
 
   refreshTime: () => {
     let allPosts = $('.timePosted');
+    let bult = ('&bull;' + ' ');
     _.each(allPosts, (eachPost) => {
       let time = $(eachPost).data('time');
-      $(eachPost).text(moment(time).startOf('minute').fromNow());
+      $(eachPost).text(bult + moment(time).startOf('minute').fromNow());
     });
   }
 };
