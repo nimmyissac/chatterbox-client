@@ -4,7 +4,7 @@ var app = {
 
     app.server = 'https://api.parse.com/1/classes/messages';
 
-    //
+    // INIT chat box
     app.renderRoom('secret!!!');
     let room = $('#roomSelect').val();
     app.fetch(room);
@@ -66,6 +66,10 @@ var app = {
       success: function (data) {
         // console.log('fetched:', data);
         app.populateChat(data.results);
+
+        // Styling for even messages
+        $('.even').removeClass('even');
+        $('.container').filter(':even').addClass('even');
         console.log('chatterbox: Message recieved');
       },
       error: function (data) {
@@ -91,7 +95,7 @@ var app = {
     posting.append('<div class="username">' + '@' + message.username + '</div>');
       // Time Created
     posting.append('<div class="timePosted" data-time="'+ timeCreated +'">'
-                  + bult + moment(message.createdAt).startOf('minute').fromNow() + '</div>');
+                  + '- ' + moment(message.createdAt).startOf('minute').fromNow() + '</div>');
       // Message Text
     posting.append('<div class="postTxt">' + message.text + '</div>');
       // Hidden unique post ID
@@ -166,10 +170,9 @@ var app = {
 
   refreshTime: () => {
     let allPosts = $('.timePosted');
-    let bult = ('&bull;' + ' ');
     _.each(allPosts, (eachPost) => {
       let time = $(eachPost).data('time');
-      $(eachPost).text(bult + moment(time).startOf('minute').fromNow());
+      $(eachPost).text('-' + ' ' + moment(time).startOf('minute').fromNow());
     });
   }
 };

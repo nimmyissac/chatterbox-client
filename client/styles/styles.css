@@ -110,7 +110,7 @@ form input[type=text] {
   padding-top: 5px;
   padding-bottom: 5px;
   padding-left: 14px;
-  width: 96%;
+  width: 97%;
   background-color: rgba(37, 91, 178, 0.9);
   border: 1.99px solid rgba(51, 106, 196, 0.7);
   border-radius: 5.9px 18px 14px;
@@ -120,7 +120,12 @@ form input[type=text] {
   -webkit-animation-name: spawn;
   -webkit-animation-duration: 1s;
   transition-property: color, background-color, padding-top, padding-bottom, padding-left, padding-right, margin-left, margin-top, margin-bottom;
-  transition-duration: 0.28s, 0.28s, 0.32s, 0.32s, 0.32s, 0.32s, 0.32s, 0.25s, 0.25s;
+  transition-duration: 0.28s, 0.4s, 0.32s, 0.32s, 0.32s, 0.32s, 0.32s, 0.25s, 0.25s;
+}
+
+.even {
+  background-color: rgba(29, 105, 226, 0.9);
+  border-color: background-color: rgba(29, 105, 226, 0.7);
 }
 
 .username {
