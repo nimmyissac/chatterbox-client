@@ -130,14 +130,15 @@ form input[type=text] {
 
 .username {
   float: left;
-  margin-right: 5px;
 }
 
 .timePosted {
   float: left;
-  width: 83%;
+  width: 84%;
 }
 
 .postTxt {
+  margin-top: 20px;
   margin-left: 20px;
+  width: 80%;
 }

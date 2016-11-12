@@ -6,6 +6,7 @@ var app = {
 
     // INIT chat box
     app.renderRoom('secret!!!');
+    app.renderRoom('lobby');
     let room = $('#roomSelect').val();
     app.fetch(room);
 
