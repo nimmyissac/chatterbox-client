@@ -132,7 +132,7 @@ var app = {
       app.fetch(room);
       app.refreshTime();
       app.updater();
-    }, 4000);
+    }, 10000);
   },
 
   refreshTime: () => {
