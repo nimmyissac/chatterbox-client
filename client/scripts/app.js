@@ -8,12 +8,10 @@ var app = {
     app.renderRoom('secret!!!');
     app.renderRoom('lobby');
     let room = $('#roomSelect').val();
-    app.fetch(room);
+    app.fetch();
 
     // On Click Event Handlers
-    $('.username').on('click', function() {
-      app.handleUsernameClick();
-    });
+    
 
       // Sends a message with the txt in form field
     $('.submit').on('click', function() {
@@ -55,19 +53,25 @@ var app = {
   fetch: (roomname) => {
     // Query Constraint: message's roomname value must match
     var obj = {
-     "roomname": roomname,
+      'roomname': roomname,
     };
-    var query = encodeURIComponent('where='+ JSON.stringify(obj));
-
+    var query = encodeURIComponent('where=' + JSON.stringify(obj));
+    // var query = encodeURIComponent('where=' + JSON.stringify(obj) + 'order=-createdAt');
+    // query = query + 'order=-createdAt';
+     // console.log(query);
     // AJAX GET request with Query Constraint
     $.ajax({
       url: app.server + '?' + query,
       type: 'GET',
       contentType: 'application/json',
+      data: 'order=-createdAt',
       success: function (data) {
-        // console.log('fetched:', data);
+       
+        console.log('fetched:', data);
+        // debugger;
+        // app.xssTest (data.results);
         app.populateChat(data.results);
-
+        
         // Styling for even messages
         $('.even').removeClass('even');
         $('.container').filter(':even').addClass('even');
@@ -79,6 +83,12 @@ var app = {
       }
     });
   },
+  xssTest: (data) => { 
+    var filteredData = _.filter( data, function(element) {
+      return element.roomname === "lobby";
+    }); 
+    console.log (filteredData);
+  },
 
   clearMessages: () => {
     $('#chats').children().remove();
@@ -89,29 +99,38 @@ var app = {
     let timeCreated = message.createdAt;
     let symb = ('&raquo;' + ' ');
     let bult = ('&bull;' + ' ');
+
+    // Escaping to prevent XSS attacks
+    message.text = _.escape(message.text);
+    message.username = _.escape(message.username);
+
     message.text = symb + message.text;
 
     // Post Structure
       // User Name
     posting.append('<div class="username">' + '@' + message.username + '</div>');
       // Time Created
-    posting.append('<div class="timePosted" data-time="'+ timeCreated +'">'
-                  + '- ' + moment(message.createdAt).startOf('minute').fromNow() + '</div>');
+    posting.append('<div class="timePosted" data-time="' + timeCreated + '">'
+                  + ' - ' + moment(message.createdAt).startOf('minute').fromNow() + '</div>');
       // Message Text
     posting.append('<div class="postTxt">' + message.text + '</div>');
       // Hidden unique post ID
-    posting.append('<div class="postID" data-ID="'+ message.objectId + '"></div>');
+    posting.append('<div class="postID" data-ID="' + message.objectId + '"></div>');
 
     // prepend to have most recent posts at top
-    $('#chats').prepend(posting);
+    $('#chats').append(posting);
   },
 
   renderRoom: (name) => {
+    // ROOM ESCAPE TO PREVENT XSS ATTACKS
+    let originalName = name;
+    name = _.escape(name);
+    if (name !== originalName) name = 'INVALID ROOM NAME';
     // collects the roomnames of all rooms added to DOM
     let allRoomNames = $('.roomChoice').map(function() {
       return this.value;
     }).toArray();
-
+    // console.log(allRoomNames);
     // only appends 'name' if the room doesnt exist in DOM
     if (!_.contains(allRoomNames, name)) {
       let roomz = $('<option class="roomChoice" data="' + name + '">' + name + '</option>');
@@ -120,13 +139,13 @@ var app = {
   },
 
   handleUsernameClick: () => {
-
+    console.log('clicked username');
   },
 
   // uses on Click event handler to circumvent refresh from submit forms
   handleSubmit: () => {
     let txt = $('#message').val();
-    let user  = window.location.search.slice(10);
+    let user = window.location.search.slice(10);
     let room = $('#roomSelect').val();
 
     let message = {
@@ -151,7 +170,7 @@ var app = {
       if (_.indexOf(allRooms, msg.roomname) === -1) allRooms.push(msg.roomname);
 
       // only renders messages that arent currently displayed
-      if (_.indexOf(allPostsID, msg.objectId) === -1)  app.renderMessage(msg);
+      if (_.indexOf(allPostsID, msg.objectId) === -1) app.renderMessage(msg);
     });
 
     // renders unique rooms from fetch
@@ -164,17 +183,27 @@ var app = {
     setTimeout(function() {
       let room = $('#roomSelect').val();
       app.fetch(room);
+
+      $('.username').on('click', function() {
+        alert('clicked username event');
+        app.handleUsernameClick();
+      });
+
       app.refreshTime();
       app.updater();
-    }, 8000);
+    }, 8000); // refreshes every 8 seconds
   },
 
   refreshTime: () => {
     let allPosts = $('.timePosted');
     _.each(allPosts, (eachPost) => {
       let time = $(eachPost).data('time');
-      $(eachPost).text('-' + ' ' + moment(time).startOf('minute').fromNow());
+      $(eachPost).text(' -' + ' ' + moment(time).startOf('minute').fromNow());
     });
+  },
+
+  addFriend: () => {
+
   }
 };
 
