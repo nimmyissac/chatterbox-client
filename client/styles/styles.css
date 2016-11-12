@@ -120,7 +120,7 @@ form input[type=text] {
   -webkit-animation-name: spawn;
   -webkit-animation-duration: 1s;
   transition-property: color, background-color, padding-top, padding-bottom, padding-left, padding-right, margin-left, margin-top, margin-bottom;
-  transition-duration: 0.28s, 0.4s, 0.32s, 0.32s, 0.32s, 0.32s, 0.32s, 0.25s, 0.25s;
+  transition-duration: 0.28s, 0.5s, 0.32s, 0.32s, 0.32s, 0.32s, 0.32s, 0.25s, 0.25s;
 }
 
 .even {
@@ -141,4 +141,13 @@ form input[type=text] {
   margin-top: 20px;
   margin-left: 20px;
   width: 80%;
+}
+
+.friend {
+  color: rgba(37, 91, 178, 0.9);
+  background-color: white;
+}
+
+#message {
+  border-radius: 5px;
 }

@@ -67,15 +67,22 @@ var app = {
       data: 'order=-createdAt',
       success: function (data) {
        
-        console.log('fetched:', data);
+        // console.log('fetched:', data);
         // debugger;
         // app.xssTest (data.results);
         app.populateChat(data.results);
         
+        //Rebind click event handler
+        // $('.username').on('click', function() {
+        // //console.log('clicked username event');
+
+        //   app.handleUsernameClick();
+        // });
+
         // Styling for even messages
         $('.even').removeClass('even');
         $('.container').filter(':even').addClass('even');
-        console.log('chatterbox: Message recieved');
+        // console.log('chatterbox: Message recieved');
       },
       error: function (data) {
         // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -95,20 +102,30 @@ var app = {
   },
 
   renderMessage: (message) => {
-    let posting = $('<div class="container"></div>');
+    let posting = $('<div class="container" id="' + message.objectId + '"></div>');
     let timeCreated = message.createdAt;
     let symb = ('&raquo;' + ' ');
     let bult = ('&bull;' + ' ');
 
+    //save old
+    let oldtext = message.text;
+    let olduser = message.username;
+    let isXSS = false;
     // Escaping to prevent XSS attacks
     message.text = _.escape(message.text);
     message.username = _.escape(message.username);
+
+    if (oldtext !== message.text || olduser !== message.username) {
+      isXSS = true;
+      console.log('Caught XSS Attack!');
+    }
 
     message.text = symb + message.text;
 
     // Post Structure
       // User Name
-    posting.append('<div class="username">' + '@' + message.username + '</div>');
+    posting.append('<div class="username" data-user="' + message.username 
+                                          + '">' + '@' + message.username + '</div>');
       // Time Created
     posting.append('<div class="timePosted" data-time="' + timeCreated + '">'
                   + ' - ' + moment(message.createdAt).startOf('minute').fromNow() + '</div>');
@@ -118,7 +135,23 @@ var app = {
     posting.append('<div class="postID" data-ID="' + message.objectId + '"></div>');
 
     // prepend to have most recent posts at top
-    $('#chats').append(posting);
+    // if santization changes either username or message, dont appen
+  
+    if (!isXSS) {
+      $('#chats').append(posting);
+    }
+    
+    
+    //////////////////////////////////////////////////////////
+    //Bind click event handler to container for unique messages
+    $('#' + message.objectId).on('click', function() {
+        //console.log('clicked username event');
+      let friend = $('#' + message.objectId).find('.username').data('user');
+      $('.friend').removeClass('friend');
+      app.addFriend(friend);
+      // $('#' + message.objectId).addClass('friend');
+      app.handleUsernameClick();
+    });
   },
 
   renderRoom: (name) => {
@@ -145,16 +178,26 @@ var app = {
   // uses on Click event handler to circumvent refresh from submit forms
   handleSubmit: () => {
     let txt = $('#message').val();
-    let user = window.location.search.slice(10);
-    let room = $('#roomSelect').val();
+    // console.log('txt', txt.slice(0, 6));
+    if (txt.slice(0, 6) === '!join ') {
+      room = txt.slice(6);
+      // console.log(room);
+      app.renderRoom(room);
+      $('#roomSelect').val(room);
+      $('#roomSelect').trigger('click');
+    } else {
+      let user = window.location.search.slice(10);
+      let room = $('#roomSelect').val();
 
-    let message = {
-      username: user,
-      text: txt,
-      roomname: room
-    };
+      let message = {
+        username: user,
+        text: txt,
+        roomname: room
+      };
 
-    app.send(message);
+      app.send(message);
+    }
+    
   },
 
   populateChat: (chat) => {
@@ -163,7 +206,7 @@ var app = {
     let allPostsID = $('.postID').map(function() {
       return $(this).data('id');
     }).toArray();
-
+    // console.log(allPostsID);
     // Iterates over all recieved messages from fetch
     _.each(chat, (msg) => {
       // collects unique roomnames from messages
@@ -184,11 +227,6 @@ var app = {
       let room = $('#roomSelect').val();
       app.fetch(room);
 
-      $('.username').on('click', function() {
-        alert('clicked username event');
-        app.handleUsernameClick();
-      });
-
       app.refreshTime();
       app.updater();
     }, 8000); // refreshes every 8 seconds
@@ -202,8 +240,14 @@ var app = {
     });
   },
 
-  addFriend: () => {
-
+  addFriend: (friend) => {
+    let allPosts = $('.username').toArray();
+    _.each(allPosts, (eachPost) => {
+      let dataCheck = $(eachPost).data('user');
+      if (dataCheck === friend) {
+        $(eachPost).parent().addClass('friend');
+      }
+    });
   }
 };
 
